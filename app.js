@@ -46,12 +46,46 @@ if (process.env.ASSISTANT_IAM_APIKEY && process.env.ASSISTANT_IAM_APIKEY != '') 
   });
 }
 
+let token ="EAAEEALYeNyYBAFmFin0dl68kPOgupsNeJqmNZCtrjTpAx4fIGTGO7n7FOW6ZBFHhfIBVXx1ibg84aDtqwXqBn1Ro5hbZCCnHU9Eetis6jKrn16xzwzQtLPSYf2bN31fRcKQ9hXxbVUZAuidApB5QZBZCztZB6PUbcc7BmrC2nUsvAZDZD";
+
 app.get('/api/webhook/', function (req, res) {
 	if(req.query['hub.verify_token']==="cocoa"){
 		res.send(req.query['hub.challenge']);
 	}
 	res.send("wrong token");
 });
+
+app.post('/api/webhook/', function (req, res) {
+	let m_events = req.body.entry[0].messaging_events
+	for(let i = 0;i< m_events.length; i++ ){
+		let evt = m_events[i];
+		let sender = evt.sender.id
+		if(evt.message && evt.message.text){
+			let txt = evt.message.text
+			sendText(sender,"Text echo:"+txt.substring(0,100))
+		}
+	}
+	res.sendStatus(200)
+});
+
+function sendText(sender,text){
+	let m_data = {text:text}
+	request({
+		url:"",
+		qs:{access_token:token},
+		method:"POST",
+		json:{
+			recipient:{id:sender},
+			message:m_data
+		}
+		},function(err,resp,body){
+				if(err){
+					console.log("sending error")
+				}else if(resp.body.error){
+					console.log("response body error")
+				}
+		});
+}
 
 
 // Endpoint to be call from the client side
