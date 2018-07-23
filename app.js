@@ -46,6 +46,14 @@ if (process.env.ASSISTANT_IAM_APIKEY && process.env.ASSISTANT_IAM_APIKEY != '') 
   });
 }
 
+app.get('/api/webhook/', function (req, res) {
+	if(req.query['hub.verify_token']==="cocoa"){
+		res.send(req.query['hub.challenge']);
+	}
+	res.send("wrong token");
+});
+
+
 // Endpoint to be call from the client side
 app.post('/api/message', function (req, res) {
   var workspace = process.env.WORKSPACE_ID || '<workspace-id>';
